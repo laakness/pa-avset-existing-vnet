@@ -1,0 +1,256 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "region of resources"
+            },
+			"value": "northcentralus"
+        },
+        "newStorageAccount": {
+            "type": "string",
+            "metadata": {
+                "description": "Globally unique lowercase name of your storage account"
+            },
+			"value": "storageaccountname"
+        },
+        "storageAccountType": {
+            "type": "string",
+			"metadata": {
+			"description": "The type of the Storage Account created"
+			},
+			"defaultValue":"Standard_LRS",
+			"value": "Standard_LRS"
+		},
+        "storageAccountNewOrExisting" : {
+            "type": "string",
+            "defaultValue" : "new",
+            "allowedValues" : [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "Description": "Indicates whether the Storage Account is new or existing"
+            },
+			"value": "new"
+        },
+        "existingStorageAccountRG": {
+            "type": "string",
+            "defaultValue" : "",
+            "metadata": {
+               "description": "Storage Resource Group of the Existing VM."
+            },
+			"value": "existing-storage-account-resource-group"
+        },
+        "dnsNameForPublicIP": {
+            "type": "string",
+            "metadata": {
+                "description": "Globally unique DNS name to access management interface of VM-Series firewall"
+            },
+			"value": "unique-dns-name"
+        },
+        "vmName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of VM-Series VM in the Azure portal"
+            },
+			"value": "vm-name-for-firewall"
+        },
+        "adminUserName": {
+            "type": "string",
+            "metadata": {
+                "description": "Username for VM-Series administrator"
+            },
+			"value": "admin"
+        },
+        "adminPassword": {
+            "type": "securestring",
+			"defaultValue": "<YOUR PASSWORD>",
+            "metadata": {
+                "description": "Password for VM-Series administrator"
+            },
+			"value": "changeme"
+        },
+        "authenticationType": {
+            "type": "string",
+            "metadata": {
+                "descritpion": "Type of authentication "
+            },
+            "allowedValues": [
+                "sshPublicKey",
+                "password"
+            ],
+            "value": "password"
+        },
+        "sshKey": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "SSH rsa public key file as a string."
+            },
+			"value": "<null>"
+        },
+        "imageVersion": {
+            "type": "string",
+            "defaultValue": "latest",
+            "allowedValues": [
+                "7.1.1",
+				"8.0.0",
+				"8.1.0"
+            ],
+            "metadata": {
+                "description": "PAN-OS version."
+            },
+			"value": "8.1.0"
+        },    
+        "imageSku": {
+            "type": "string",
+            "defaultValue": "byol",
+            "allowedValues": [
+                "byol",
+				"bundle1",
+				"bundle2"
+            ],
+            "metadata": {
+                "description": "VM-Series model: BYOL or hourly pay-as-you-go (PAYG): Bundle 1 or Bundle 2"
+            },
+			"value": "byol"
+        },
+		"vmSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_D3",
+				"Standard_D3_v2",
+                "Standard_D4", 
+				"Standard_D4_v2",
+				"Standard_D5",
+				"Standard_D5_v2",
+                "Standard_A4"		    
+            ],
+            "metadata": {
+                "description": "Azure VM size for VM-Series"
+            },
+			"value": "Standard_D3_v2"
+        },
+		"availabilitySetName": {
+            "type": "string",
+			"defaultValue": "VMSeriesFwAvSet",
+            "metadata": {
+                "description": "Azure Availability Set for VM-Series firewalls"
+            },
+			"value": "firewallname-avset"
+        },
+        "srcIPInboundNSG": {
+            "type": "string",
+            "metadata": {
+                "description": "Your source public IP address. Added to the inbound DefaultNSG on eth0 (MGMT)"
+            },
+			"value": "1.2.3.4/24"
+        },
+        "baseUrl" : {
+		"type" : "string",
+		"metadata": {
+			"artifactsBaseUrl": ""
+		},
+		"value": "https://raw.githubusercontent.com/PaloAltoNetworks/azure/master/vmseries-avset"
+	},
+	"virtualNetworkExistingRGName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of resource group of existing VNET (if applicable)"
+            },
+			"value": "existing-vnet-rg"
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the virtual network that the consumer wants to use"
+      },
+      "defaultValue": "panVnet",
+	  "value": "existing-vnet"
+    },
+    "virtualNetworkAddressPrefix": {
+      "type": "string",
+      "defaultValue": "192.168.0.0/16",
+      "metadata": {
+        "description": "Virtual network address CIDR"
+      },
+	  "value": "10.100.0.0/16"
+    },
+    "subnet0Name": {
+      "type": "string",
+      "defaultValue": "Mgmt",
+      "metadata": {
+        "description": "Subnet for the Mgmt"
+      },
+	  "value": "mgmt"
+    },
+    "subnet1Name": {
+      "type": "string",
+      "defaultValue": "Untrust",
+      "metadata": {
+        "description": "Subnet for the Untrust"
+      },
+	  "value": "untrust-zone"
+    },
+    "subnet2Name": {
+      "type": "string",
+      "defaultValue": "Trust",
+      "metadata": {
+        "description": "Subnet for the Trust"
+      },
+	  "value": "trust-zone"
+    },
+    "subnet0Prefix": {
+      "type": "string",
+      "defaultValue": "192.168.0.0/24",
+      "metadata": {
+        "description": "Mgmt subnet CIDR"
+      },
+	  "value": "10.100.1.0/24"
+    },
+    "subnet1Prefix": {
+      "type": "string",
+      "defaultValue": "192.168.1.0/24",
+      "metadata": {
+        "description": "Untrust subnet CIDR"
+      },
+	  "value": "10.100.2.0/24"
+    },
+    "subnet2Prefix": {
+      "type": "string",
+      "defaultValue": "192.168.2.0/24",
+      "metadata": {
+        "description": "Trust subnet CIDR"
+      },
+	  "value": "10.100.3.0/24"
+    },
+    "subnet0StartAddress": {
+      "type": "string",
+      "defaultValue": "192.168.0.10",
+      "metadata": {
+        "description": "Mgmt subnet start address"
+      },
+	  "value": "10.100.1.4"
+    },
+    "subnet1StartAddress": {
+      "type": "string",
+      "defaultValue": "192.168.1.10",
+      "metadata": {
+        "description": "Untrust subnet start address"
+      },
+	  "value": "10.100.2.4"
+    },
+    "subnet2StartAddress": {
+      "type": "string",
+      "defaultValue": "192.168.2.10",
+      "metadata": {
+        "description": "Trust subnet start address"
+      },
+	  "value": "10.100.3.4"
+    }
+    }
+  }
